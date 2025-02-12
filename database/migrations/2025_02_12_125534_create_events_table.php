@@ -11,21 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('businesses', function (Blueprint $table) {
+        Schema::create('events', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('user_id'); // Foreign key to users table // Owner of the event
             $table->string('name');
-            $table->string('phone_number');
-            $table->string('fax')->nullable();
-            $table->string('email');
-            $table->text('address');
-            $table->string('tax_id');
-            $table->string('type_of_business');
-            $table->string('type_of_ownership');
-            $table->decimal('estimated_value', 15, 2)->nullable();
+            $table->string('event_type'); // Corporate, Social, etc.
+            $table->date('date');
+            $table->time('start_time');
+            $table->time('end_time');
+            $table->string('location');
+            $table->integer('people_capacity')->nullable();
             $table->text('description')->nullable();
             $table->timestamps();
-            
+
+            // Index for faster queries
             $table->index('user_id');
         });
     }
@@ -35,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('businesses');
+        Schema::dropIfExists('events');
     }
 };

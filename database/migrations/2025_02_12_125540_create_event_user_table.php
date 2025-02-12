@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('custom_sport_fitness_field', function (Blueprint $table) {
+        Schema::create('event_user', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('sports_fitness_id')->constrained('sports_fitness')->onDelete('cascade');
-            $table->string('name');
-            $table->string('value');
+            $table->foreignId('event_id')->constrained()->onDelete('cascade'); // Reference to Event
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Reference to User
+            $table->string('status')->default('pending'); // Status: pending,accepted, declined
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('custom_sport_fitness_field');
+        Schema::dropIfExists('event_user');
     }
 };
