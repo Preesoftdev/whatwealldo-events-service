@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('event_user', function (Blueprint $table) {
+        Schema::create('event_task_user', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('event_id')->constrained()->onDelete('cascade'); // Reference to Event
-            $table->unsignedBigInteger('user_id');// Reference to User
-            $table->string('status')->default('pending'); // Status: pending,accepted, declined
+            $table->unsignedBigInteger('event_task_id');
+            $table->unsignedBigInteger('user_id'); // Assigned user
             $table->timestamps();
-
+            
+            $table->foreign('event_task_id')->references('id')->on('event_tasks')->onDelete('cascade');
             $table->index('user_id');
         });
     }
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('event_user');
+        Schema::dropIfExists('event_task_user');
     }
 };

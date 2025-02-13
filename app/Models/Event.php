@@ -26,16 +26,15 @@ class Event extends Model
      */
     public function attendees()
     {
-        return $this->belongsToMany(User::class, 'event_user')
-            ->withPivot('status')
-            ->withTimestamps();
+        return $this->hasMany(EventUser::class, 'event_id');
     }
 
+    /**
+     * Retrieve pending users for the event.
+     */
     public function pendingAttendees()
     {
-        return $this->belongsToMany(User::class, 'event_user')
-            ->wherePivot('status', 'pending')
-            ->withTimestamps();
+        return $this->hasMany(EventUser::class, 'event_id')->where('status', 'pending');
     }
 
     /**
@@ -44,5 +43,21 @@ class Event extends Model
     public function owner()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+    public function tasks()
+    {
+        return $this->hasMany(EventTask::class);
+    }
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($event) {
+            foreach ($event->tasks as $task) {
+                $task->assignedUsers()->delete(); // Delete assigned users first
+                $task->delete(); // Then delete the task
+            }
+        });
     }
 }
