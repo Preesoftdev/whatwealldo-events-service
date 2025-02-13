@@ -48,6 +48,10 @@ class Event extends Model
     {
         return $this->hasMany(EventTask::class);
     }
+    public function subEvents()
+    {
+        return $this->hasMany(SubEvent::class, 'event_id');
+    }
 
     public static function boot()
     {
