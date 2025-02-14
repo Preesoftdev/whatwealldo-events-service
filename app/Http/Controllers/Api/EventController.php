@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Event\EventRequest;
 use App\Http\Resources\EventResource;
 use App\Models\Event;
+use App\Models\EventUser;
+use App\Models\GroupMember;
 use App\Traits\ResponseMethodTrait;
 use Illuminate\Http\Request;
 
@@ -69,5 +71,31 @@ class EventController extends Controller
         $event->delete();
 
         return $this->sendResponse([], 'Event Deleted Successfully.');
+    }
+    public function addGroupUsers(Request $request, Event $event)
+    {
+        // Validate the request to ensure group_ids is an array
+        $validated = $request->validate([
+            'group_ids' => 'required|array',
+            'group_ids.*' => 'exists:people_groups,id',
+        ]);
+
+        // Fetch all user IDs from the given groups
+        $userIds = GroupMember::whereIn('people_group_id', $validated['group_ids'])
+            ->pluck('user_id')
+            ->unique()
+            ->toArray();
+
+        // Insert users into the event_user table (avoiding duplicates)
+        foreach ($userIds as $userId) {
+            EventUser::firstOrCreate([
+                'event_id' => $event->id,
+                'user_id' => $userId,
+            ], [
+                'status' => 'pending', // Default invitation status
+            ]);
+        }
+        return $this->sendResponse([], 'Attendie added to the event successfully');
+       
     }
 }

@@ -6,9 +6,13 @@ use App\Http\Controllers\Api\EventTaskController;
 use App\Http\Controllers\Api\EventTicketController;
 use App\Http\Controllers\Api\PendingTicketController;
 
+use App\Http\Controllers\Api\PeopleGroupController;
+
 use App\Http\Controllers\Api\SubEventController;
 use App\Models\EventTicket;
 use Illuminate\Support\Facades\Route;
+
+
 
 
 
@@ -35,4 +39,8 @@ Route::middleware(['verified'])->group(function () {
         Route::get('/ticket-purchase/{ticketCode}', [PendingTicketController::class, 'show']);
         Route::get('/pending-tickets', [PendingTicketController::class, 'index']); // List all pending tickets
     });
+    Route::apiResource('/groups', PeopleGroupController::class)->except(['show','update']);
+    Route::post('/events/{event}/add-group-users', [EventController::class, 'addGroupUsers']);
+    Route::post('/groups/{group}/add-member', [PeopleGroupController::class, 'addMember']);
+    Route::post('/events/{event}/add-group-users', [EventController::class, 'addGroupUsers']);
 });
