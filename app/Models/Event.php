@@ -52,7 +52,11 @@ class Event extends Model
     {
         return $this->hasMany(SubEvent::class, 'event_id');
     }
-
+    public function tickets()
+    {
+        return $this->hasMany(EventTicket::class);
+    }
+    
     public static function boot()
     {
         parent::boot();
