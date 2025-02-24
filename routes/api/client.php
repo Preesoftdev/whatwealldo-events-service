@@ -13,13 +13,6 @@ use App\Models\EventTicket;
 use Illuminate\Support\Facades\Route;
 
 
-
-
-
-
-
-
-
 Route::middleware(['verified'])->group(function () {
     Route::apiResource('events', EventController::class)->except(['show']);
     Route::apiResource('/events/{event}/tasks', EventTaskController::class)->except(['show']);

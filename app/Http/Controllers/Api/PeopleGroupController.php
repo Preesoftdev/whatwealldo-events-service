@@ -22,25 +22,25 @@ class PeopleGroupController extends Controller
 
         // Extract user IDs from group members
         $userIds = $groups->flatMap(fn($group) => $group->members->pluck('user_id'))->unique()->toArray();
-    
+
         // Fetch user details from the user microservice
         $users = Http::get(env('APP_INTERNAL_LINK') . '/api/users', [
             'ids' => implode(',', $userIds) // Send user IDs as a query parameter
         ])->json();
-    
+
         // Attach user details to group members
         $groups->each(function ($group) use ($users) {
             $group->members->each(function ($member) use ($users) {
                 $member->user_details = collect($users)->firstWhere('id', $member->user_id);
             });
         });
-    
+
         return $this->sendResponse(PeopleGroupResource::collection($groups), 'People Group members Retrieved Successfully');
-    
     }
 
     public function store(PeopleGroupRequest $request)
     {
+
         $user = _user();
         // Create the group with the request data and associate it with the creator
         $group = PeopleGroup::updateOrCreate(
@@ -50,25 +50,49 @@ class PeopleGroupController extends Controller
                 'privacy' => $request->privacy
             ]
         );
-        
 
-        return $this->sendResponse($group, 'Group Created Successfully');
+
+
+        // Ensure `userIds` is an array before looping
+        if (!empty($request->user_ids) && is_array($request->user_ids)) {
+            foreach ($request->user_ids as $userId) {
+                \Log::info('Processing user ID:', ['user_id' => $userId]);
+
+                GroupMember::firstOrCreate([
+                    'people_group_id' => $group->id,
+                    'user_id' => $userId,
+                ]);
+            }
+        }
+
+        return $this->sendResponse(new PeopleGroupResource($group->load('members')), 'Group Created Successfully');
     }
     public function update(PeopleGroupRequest $request)
     {
         $user = _user();
         // Create the group with the request data and associate it with the creator
         $group = PeopleGroup::updateOrCreate(
-            ['user_id' => $user->id,
-             'name' => $request->name,
+            [
+                'user_id' => $user->id,
+                'name' => $request->name,
             ], // Search condition
-            [               
+            [
                 'privacy' => $request->privacy
             ]
         );
-        
+        if (!empty($request->user_ids) && is_array($request->user_ids)) {
+            $group->members()->delete();
+            foreach ($request->user_ids as $userId) {
+                \Log::info('Processing user ID:', ['user_id' => $userId]);
 
-        return $this->sendResponse($group, 'Group Created Successfully');
+                GroupMember::firstOrCreate([
+                    'people_group_id' => $group->id,
+                    'user_id' => $userId,
+                ]);
+            }
+        }
+
+        return $this->sendResponse(new PeopleGroupResource($group->load('members')), 'Group Created Successfully');
     }
 
 
@@ -79,19 +103,19 @@ class PeopleGroupController extends Controller
             'user_ids' => 'required|array',
             'user_ids.*' => 'integer', // Ensure each value in the array is a valid integer
         ]);
-    
+
         // Ensure $userIds is an array of user IDs
-        $userIds = $validated['user_ids']; 
-    
+        $userIds = $validated['user_ids'];
+
         // Insert each user ID into the group_members table
         foreach ($userIds as $userId) {
             GroupMember::firstOrCreate([
                 'people_group_id' => $group->id,
                 'user_id' => $userId,
             ]);
-        }    
-    
- 
-     return $this->sendResponse(new PeopleGroupResource($group->load('members'), 'Users added to the group successfully'));
+        }
+
+
+        return $this->sendResponse(new PeopleGroupResource($group->load('members'), 'Users added to the group successfully'));
     }
 }

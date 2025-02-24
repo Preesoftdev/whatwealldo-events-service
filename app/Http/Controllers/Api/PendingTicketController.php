@@ -25,11 +25,11 @@ class PendingTicketController extends Controller
        
         $ticket = EventTicket::findOrFail($request->ticket_id);
       
-        $ticketCount = count($request->emails);
+        // $ticketCount = count($request->emails);
 
-        if ($ticket->quantity < $ticketCount) {
-            return response()->json(['error' => 'Not enough tickets available'], 400);
-        }
+        // if ($ticket->quantity < $ticketCount) {
+        //     return response()->json(['error' => 'Not enough tickets available'], 400);
+        // }
 
       
         $pendingTickets = [];
@@ -55,7 +55,7 @@ class PendingTicketController extends Controller
         }
 
         // Reduce available ticket quantity
-        $ticket->decrement('quantity', $ticketCount);
+   //     $ticket->decrement('quantity', $ticketCount);
 
         return $this->sendResponse($pendingTickets, 'Bulk tickets generated and sent successfully!');
     }

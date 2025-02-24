@@ -12,6 +12,8 @@ class PeopleGroupRequest extends FormRequest
         return [
             'name' => 'required|string|max:255|unique:people_groups,name',
             'privacy' => 'required|in:public,private',
+            'user_ids' => 'nullable|array',
+            'user_ids.*' => 'integer', // Ensure each value in the array is a valid integer
         ];
     }
 }
