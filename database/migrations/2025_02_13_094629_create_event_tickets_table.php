@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('ticket_type'); // Paid, Free, Donation, Guest Pass
             $table->string('name'); // Ticket name
             $table->decimal('price', 8, 2)->nullable(); // Price (nullable for free tickets)
+            $table->string('currency')->default('usd'); 
             $table->integer('quantity')->nullable(); // Max available tickets
             $table->integer('sold')->default(0); // Number of sold tickets
             $table->enum('payment_status', ['pending', 'paid', 'failed'])->default('pending');

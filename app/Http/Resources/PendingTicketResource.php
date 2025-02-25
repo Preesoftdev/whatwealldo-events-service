@@ -22,11 +22,12 @@ class PendingTicketResource extends JsonResource
                 'type' => $this->ticket->ticket_type,
                 'price' => $this->ticket->price,
                 'quantity' => $this->ticket->quantity,
+                'currency' => $this->ticket->currency,
             ],
             'buyer_email' => $this->buyer_email,
             'ticket_code' => $this->ticket_code,
             'status' => $this->status,
-            'purchase_link' => url("/ticket-purchase/{$this->ticket_code}"),
+            'purchase_link' => url("/ticket-purchase/{$this->ticket_code}/pay"),
         ];
     }
 }

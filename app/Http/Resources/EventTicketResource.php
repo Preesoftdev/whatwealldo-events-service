@@ -21,6 +21,7 @@ class EventTicketResource extends JsonResource
             'name' => $this->name,
             'price' => $this->price,
             'quantity' => $this->quantity,
+            'currency' => $this->currency,
             'sold' => $this->sold,
             'payment_status' => $this->payment_status,
             'sale_end_date' => $this->sale_end_date,
