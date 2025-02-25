@@ -16,7 +16,13 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['verified'])->group(function () {
     Route::apiResource('events', EventController::class)->except(['show']);
     Route::apiResource('/events/{event}/tasks', EventTaskController::class)->except(['show']);
-
+    Route::prefix('events')->group(function () {
+        Route::get('/link/{link}', [EventController::class, 'getByLink']);
+        Route::get('/dashboard', [EventController::class, 'getEventCounts']);
+        Route::post('/{event}/publish', [EventController::class, 'publishEvent']);
+        Route::get('/{event}/toggle-save', [EventController::class, 'toggleSave']);
+    });
+   
     Route::prefix('events/{event}')->group(function () {
         Route::get('/tickets', [EventTicketController::class, 'index']); // Get all sub-events of an event
         Route::post('/tickets', [EventTicketController::class, 'store']); // Create a new sub-event

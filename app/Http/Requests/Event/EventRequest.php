@@ -12,7 +12,7 @@ class EventRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'event_type' => 'required|string|max:255',
-            'date' => 'required|date',
+            'date' => 'required|date|after_or_equal:today',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
             'location' => 'required|string|max:255',

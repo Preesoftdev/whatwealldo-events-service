@@ -21,6 +21,8 @@ class EventResource extends JsonResource
             'location' => $this->location,
             'people_capacity' => $this->people_capacity,
             'description' => $this->description,
+            'publish' =>(bool) $this->publish,
+            'link' => url('/events/' . $this->link), // Full event link
             'attendees' => $this->whenLoaded('attendees', function () {
                 return $this->attendees->pluck('id'); // Returns an array of user IDs attending the event
             }),

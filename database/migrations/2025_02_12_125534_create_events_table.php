@@ -22,6 +22,8 @@ return new class extends Migration
             $table->string('location');
             $table->integer('people_capacity')->nullable();
             $table->text('description')->nullable();
+            $table->integer('publish')->default(0);
+            $table->string('link')->unique();
             $table->timestamps();
 
             // Index for faster queries

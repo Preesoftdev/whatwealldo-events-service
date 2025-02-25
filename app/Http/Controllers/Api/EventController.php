@@ -8,7 +8,9 @@ use App\Http\Resources\EventResource;
 use App\Models\Event;
 use App\Models\EventUser;
 use App\Models\GroupMember;
+use App\Models\SavedEvent;
 use App\Traits\ResponseMethodTrait;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class EventController extends Controller
@@ -98,4 +100,68 @@ class EventController extends Controller
         return $this->sendResponse([], 'Attendie added to the event successfully');
        
     }
+    public function getEventCounts()
+    {
+        $today = Carbon::today();
+
+        // Count upcoming events (future dates)
+        $upcomingCount = Event::where('date', '>=', $today)->count();
+
+        // Count completed events (past dates)
+        $completedCount = Event::where('date', '<', $today)->count();
+        return $this->sendResponse([
+            'counts' => [
+                'upcoming' => $upcomingCount,
+                'completed' => $completedCount,
+            ]
+        ]);
+    }
+    public function getByLink($link)
+    {
+        $event = Event::where('link', $link)->first();
+
+        if (!$event) {
+            return $this->sendError('Event not found');
+        }
+        return $this->sendResponse(new EventResource($event));
+    }
+    public function PublishEvent(Request $request, Event $event){
+        try {
+            // If group_id is provided, assign users from the group
+            if ($request->filled('group_id')) {
+                $groupMembers = GroupMember::where('people_group_id', $request->group_id)->pluck('user_id');
+              
+                if ($groupMembers->isNotEmpty()) {
+                foreach ($groupMembers as $userId) {
+                    
+               EventUser::updateOrCreate(
+                ['event_id' => $event->id, 'user_id' => $userId] // Only search criteria, no updates
+                );
+                }
+            }
+        }
+        $event->update([
+         'publish' => 1
+        ]);
+            return $this->sendResponse(new EventResource($event), 'Event Published Successfully');
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to publish event', 'error' => $e->getMessage()], 500);
+        }
+    
+    }
+    public function toggleSave(Event $event)
+    {
+        $user = _user();
+        // Toggle save/unsave
+        $saved = SavedEvent::where(['user_id' => $user->id, 'event_id' => $event->id])->first();
+
+        if ($saved) {
+            $saved->delete();
+            return $this->sendResponse(null, 'Event unsaved');       
+         }
+        
+        SavedEvent::create(['user_id' => $user->id, 'event_id' => $event->id]);
+        return $this->sendResponse(null, 'Event saved');
+    }
+
 }

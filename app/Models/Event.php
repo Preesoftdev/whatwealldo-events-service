@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Event extends Model
 {
@@ -19,8 +20,11 @@ class Event extends Model
         'location',
         'people_capacity',
         'description',
+        'link',
+        'publish'
     ];
 
+  
     /**
      * The users attending the event (Many-to-Many).
      */
@@ -66,6 +70,9 @@ class Event extends Model
                 $task->assignedUsers()->delete(); // Delete assigned users first
                 $task->delete(); // Then delete the task
             }
+        });
+        static::creating(function ($event) {
+            $event->link = Str::uuid(); // Generate a unique UUID for the link
         });
     }
 }
