@@ -23,6 +23,7 @@ return new class extends Migration
             $table->integer('people_capacity')->nullable();
             $table->text('description')->nullable();
             $table->integer('publish')->default(0);
+            $table->integer('is_public')->default(0);
             $table->string('link')->unique();
             $table->timestamps();
 

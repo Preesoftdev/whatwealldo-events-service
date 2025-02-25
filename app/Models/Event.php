@@ -23,7 +23,8 @@ class Event extends Model implements HasMedia
         'people_capacity',
         'description',
         'link',
-        'publish'
+        'publish',
+        'is_public'
     ];
 
   
