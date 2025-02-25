@@ -22,8 +22,14 @@ Route::middleware(['verified'])->group(function () {
         Route::post('/{event}/publish', [EventController::class, 'publishEvent']);
         Route::get('/{event}/toggle-save', [EventController::class, 'toggleSave']);
         Route::post('/{event}/attachments', [EventController::class, 'uploadAttachments']);
+        Route::post('/filter', [EventController::class, 'filterEvents']);
+        Route::get('/search', [EventController::class, 'searchEvents']);
+
     });
    
+
+   
+    
     Route::prefix('events/{event}')->group(function () {
         Route::get('/tickets', [EventTicketController::class, 'index']); // Get all sub-events of an event
         Route::post('/tickets', [EventTicketController::class, 'store']); // Create a new sub-event

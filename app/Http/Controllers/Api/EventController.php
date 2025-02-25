@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Event\EventAttachmentRequest;
 use App\Http\Requests\Event\EventRequest;
+use App\Http\Requests\Event\EventSearchRequest;
 use App\Http\Resources\EventResource;
 use App\Models\Event;
 use App\Models\EventUser;
@@ -174,5 +175,29 @@ class EventController extends Controller
         }
 
         return $this->sendResponse(new EventResource($event), 'Event attachments uploaded successfully');
+    }
+    public function filterEvents(Request $request)
+    {
+        $request->validate([
+            'event_type' => 'required|string|in:personal,corporate,charity'
+        ]);
+
+        // Fetch events based on event_type
+        $events = Event::where('event_type', $request->event_type)->get();
+
+        return $this->sendResponse(EventResource::collection($events), 'Events filtered successfully');
+    }
+    public function searchEvents(EventSearchRequest $request)
+    {
+         $name = $request->input('name');
+        // Search events by name (case-insensitive)
+        if($name){
+            $events = Event::where('name', 'LIKE', '%' . $name . '%')->get();
+        }else{
+            $events = Event::get();
+        }
+        
+
+        return $this->sendResponse(EventResource::collection($events), 'Events searched successfully');
     }
 }
