@@ -26,6 +26,7 @@ class EventResource extends JsonResource
             'attendees' => $this->whenLoaded('attendees', function () {
                 return $this->attendees->pluck('id'); // Returns an array of user IDs attending the event
             }),
+            'images' => MediaResource::collection($this->getMedia('event_attachments')),
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
         ];

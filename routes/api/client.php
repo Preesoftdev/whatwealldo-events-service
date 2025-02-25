@@ -21,6 +21,7 @@ Route::middleware(['verified'])->group(function () {
         Route::get('/dashboard', [EventController::class, 'getEventCounts']);
         Route::post('/{event}/publish', [EventController::class, 'publishEvent']);
         Route::get('/{event}/toggle-save', [EventController::class, 'toggleSave']);
+        Route::post('/{event}/attachments', [EventController::class, 'uploadAttachments']);
     });
    
     Route::prefix('events/{event}')->group(function () {

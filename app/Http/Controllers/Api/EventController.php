@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Event\EventAttachmentRequest;
 use App\Http\Requests\Event\EventRequest;
 use App\Http\Resources\EventResource;
 use App\Models\Event;
@@ -158,10 +159,20 @@ class EventController extends Controller
         if ($saved) {
             $saved->delete();
             return $this->sendResponse(null, 'Event unsaved');       
-         }
+        }
         
         SavedEvent::create(['user_id' => $user->id, 'event_id' => $event->id]);
         return $this->sendResponse(null, 'Event saved');
     }
+    public function uploadAttachments(EventAttachmentRequest $request,Event $event)
+    {
+        
+        // Loop through each uploaded file
+        foreach ($request->file('files') as $file) {
+            $event->addMedia($file)
+                  ->toMediaCollection('event_attachments');
+        }
 
+        return $this->sendResponse(new EventResource($event), 'Event attachments uploaded successfully');
+    }
 }
