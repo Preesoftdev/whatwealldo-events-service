@@ -16,6 +16,9 @@ class PaymentController extends Controller
 
     public function index(Request $request){
         $pendingTicketId = $request->query('pending_ticket_id');
+        PendingTicket::where('id',$pendingTicketId)->update([
+              'status' => 'paid',
+        ]);
         return $this->sendResponse('Payment succeeded succesfully.');
     }
     public function Errormessage(){
@@ -57,7 +60,7 @@ class PaymentController extends Controller
                 ]],
                 'mode' => 'payment',
                 // Update these URLs to routes in your application that handle success and cancel scenarios.
-                'success_url' => url('/payment-success?pending_ticket_id=' . $pendingTicket->id),
+                'success_url' => url('/api/payment-success?pending_ticket_id=' . $pendingTicket->id),
                 'cancel_url'  => url('/api/payment-cancel'),
             ]);
 

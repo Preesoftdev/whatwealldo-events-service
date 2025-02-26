@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('ticket_id')->constrained()->onDelete('cascade');
             $table->string('buyer_email');
             $table->string('ticket_code')->unique();
-            $table->enum('status', ['pending', 'completed'])->default('pending');
+            $table->enum('status', ['pending', 'paid'])->default('pending');
             $table->timestamps();
         });
     }
